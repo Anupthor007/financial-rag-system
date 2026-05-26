@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial RAG System</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <h1>Financial Document Management System</h1>
+
+            <p>
+                AI-powered semantic search for financial documents
+            </p>
+        </header>
+
+        <section class="card">
+
+            <h2>Upload Financial Document</h2>
+
+            <form id="uploadForm">
+
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Document Title"
+                    required
+                >
+
+                <input
+                    type="text"
+                    id="company_name"
+                    placeholder="Company Name"
+                    required
+                >
+
+                <select id="document_type">
+
+                    <option value="report">
+                        Report
+                    </option>
+
+                    <option value="invoice">
+                        Invoice
+                    </option>
+
+                    <option value="contract">
+                        Contract
+                    </option>
+
+                </select>
+
+                <input
+                    type="text"
+                    id="uploaded_by"
+                    placeholder="Uploaded By"
+                    required
+                >
+
+                <input
+                    type="file"
+                    id="file"
+                    accept=".pdf"
+                    required
+                >
+
+                <button type="submit">
+                    Upload Document
+                </button>
+
+            </form>
+
+            <p id="uploadMessage"></p>
+
+        </section>
+
+        <section class="card">
+
+            <h2>Semantic Search</h2>
+
+            <div class="search-container">
+
+                <input
+                    type="text"
+                    id="searchQuery"
+                    placeholder="Search financial insights..."
+                >
+
+                <button onclick="searchDocuments()">
+                    Search
+                </button>
+
+            </div>
+
+            <div id="results"></div>
+
+        </section>
+
+    </div>
+
+    <script src="/static/js/app.js"></script>
+
+</body>
+
+</html>
