@@ -16,6 +16,11 @@ from app.database import get_db
 from app.models.document import Document
 from app.schemas.document import DocumentResponse
 
+from app.utils.dependencies import (
+    get_current_user,
+    require_roles
+)
+
 router = APIRouter(
     prefix="/documents",
     tags=["Documents"]
@@ -73,7 +78,8 @@ def upload_document(
 
 @router.get("/", response_model=list[DocumentResponse])
 def get_all_documents(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     documents = db.query(Document).all()
 
@@ -83,7 +89,8 @@ def get_all_documents(
 @router.get("/{document_id}", response_model=DocumentResponse)
 def get_document(
     document_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     document = db.query(Document).filter(
         Document.id == document_id
@@ -101,7 +108,10 @@ def get_document(
 @router.delete("/{document_id}")
 def delete_document(
     document_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_roles(["Admin"])
+    )
 ):
     document = db.query(Document).filter(
         Document.id == document_id
@@ -128,7 +138,8 @@ def delete_document(
 def search_documents(
     company_name: str = "",
     document_type: str = "",
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     query = db.query(Document)
 

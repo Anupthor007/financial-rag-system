@@ -1,6 +1,7 @@
 const uploadForm = document.getElementById("uploadForm");
 
 uploadForm.addEventListener("submit", async (event) => {
+
     event.preventDefault();
 
     const formData = new FormData();
@@ -42,7 +43,8 @@ uploadForm.addEventListener("submit", async (event) => {
 
     document.getElementById(
         "uploadMessage"
-    ).innerText = data.message;
+    ).innerText =
+        data.message || data.detail;
 });
 
 
