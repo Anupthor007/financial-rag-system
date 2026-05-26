@@ -33,9 +33,13 @@ def index_document(
             detail="Document not found"
         )
 
-    documents = load_pdf(document.file_path)
+    documents = load_pdf(
+        document.file_path
+    )
 
-    chunks = split_documents(documents)
+    chunks = split_documents(
+        documents
+    )
 
     store_in_chroma(
         chunks,
@@ -53,7 +57,8 @@ def search_rag(query: str):
 
     return {
         "query": query,
-        "results": results["documents"][0]
+        "total_results": len(results),
+        "results": results
     }
 
 
@@ -61,7 +66,9 @@ def search_rag(query: str):
 def remove_document(
     document_id: int
 ):
-    remove_document_embeddings(document_id)
+    remove_document_embeddings(
+        document_id
+    )
 
     return {
         "message": "Document embeddings removed successfully"
@@ -77,7 +84,13 @@ def get_document_context(
         top_k=10
     )
 
+    filtered_results = [
+        result
+        for result in results
+        if result["document_id"] == str(document_id)
+    ]
+
     return {
         "document_id": document_id,
-        "context": results["documents"][0]
+        "context": filtered_results
     }

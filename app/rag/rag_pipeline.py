@@ -1,10 +1,9 @@
-import os
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.vectorstores import Chroma
-from sentence_transformers import SentenceTransformer
 
+from sentence_transformers import SentenceTransformer
+from sentence_transformers.util import cos_sim
 
 embedding_model = SentenceTransformer(
     "all-MiniLM-L6-v2"
@@ -15,6 +14,7 @@ CHROMA_DB_DIRECTORY = "chroma_db"
 
 def load_pdf(file_path: str):
     loader = PyPDFLoader(file_path)
+
     documents = loader.load()
 
     return documents
@@ -26,7 +26,9 @@ def split_documents(documents):
         chunk_overlap=50
     )
 
-    chunks = text_splitter.split_documents(documents)
+    chunks = text_splitter.split_documents(
+        documents
+    )
 
     return chunks
 
@@ -38,7 +40,10 @@ def create_embeddings(texts):
 
 
 def store_in_chroma(chunks, document_id):
-    texts = [chunk.page_content for chunk in chunks]
+    texts = [
+        chunk.page_content
+        for chunk in chunks
+    ]
 
     embeddings = create_embeddings(texts)
 
@@ -64,8 +69,6 @@ def store_in_chroma(chunks, document_id):
         ids=ids
     )
 
-    chroma_db.persist()
-
 
 def semantic_search(query, top_k=5):
     chroma_db = Chroma(
@@ -75,14 +78,42 @@ def semantic_search(query, top_k=5):
 
     query_embedding = embedding_model.encode(
         query
-    ).tolist()
-
-    results = chroma_db._collection.query(
-        query_embeddings=[query_embedding],
-        n_results=top_k
     )
 
-    return results
+    results = chroma_db._collection.query(
+        query_embeddings=[
+            query_embedding.tolist()
+        ],
+        n_results=20
+    )
+
+    documents = results["documents"][0]
+    metadatas = results["metadatas"][0]
+
+    reranked_results = []
+
+    for index, document in enumerate(documents):
+        document_embedding = embedding_model.encode(
+            document
+        )
+
+        similarity = cos_sim(
+            query_embedding,
+            document_embedding
+        ).item()
+
+        reranked_results.append({
+            "document_id": metadatas[index]["document_id"],
+            "content": document,
+            "similarity_score": round(similarity, 4)
+        })
+
+    reranked_results.sort(
+        key=lambda x: x["similarity_score"],
+        reverse=True
+    )
+
+    return reranked_results[:top_k]
 
 
 def remove_document_embeddings(document_id):
@@ -97,7 +128,9 @@ def remove_document_embeddings(document_id):
 
     ids_to_delete = []
 
-    for index, metadata in enumerate(data["metadatas"]):
+    for index, metadata in enumerate(
+        data["metadatas"]
+    ):
         if metadata["document_id"] == str(document_id):
             ids_to_delete.append(
                 data["ids"][index]
