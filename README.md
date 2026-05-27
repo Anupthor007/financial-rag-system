@@ -86,6 +86,7 @@ Open Swagger docs:
 ```text
 http://127.0.0.1:8000/docs
 ```
+Swagger can be used to directly test document upload and semantic search APIs.
 
 Semantic search flow:
 
@@ -100,3 +101,17 @@ Notes:
 * Uploaded PDFs are stored locally
 * Swagger can be used for backend API testing
 * ChromaDB is used as vector database
+
+## Screenshots
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Semantic Search
+
+![Semantic Search](screenshots/semantic-search.png)
+
+### Swagger API
+
+![Swagger](screenshots/swagger.png)

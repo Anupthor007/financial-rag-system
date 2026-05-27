@@ -79,7 +79,6 @@ def upload_document(
 @router.get("/", response_model=list[DocumentResponse])
 def get_all_documents(
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
 ):
     documents = db.query(Document).all()
 
@@ -90,7 +89,6 @@ def get_all_documents(
 def get_document(
     document_id: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
 ):
     document = db.query(Document).filter(
         Document.id == document_id
@@ -109,9 +107,6 @@ def get_document(
 def delete_document(
     document_id: int,
     db: Session = Depends(get_db),
-    current_user=Depends(
-        require_roles(["Admin"])
-    )
 ):
     document = db.query(Document).filter(
         Document.id == document_id
@@ -139,7 +134,6 @@ def search_documents(
     company_name: str = "",
     document_type: str = "",
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
 ):
     query = db.query(Document)
 
